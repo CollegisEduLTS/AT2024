@@ -1,0 +1,40 @@
+version: "3.2"
+services:
+  webserver:
+    build:
+      context: "./webserver/"
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+    volumes:
+      - ${PROJECT_ROOT}/:/var/www/html/
+      - ./php:/usr/local/etc/php/custom.d
+    environment:
+      PHP_INI_SCAN_DIR: "/usr/local/etc/php/custom.d:/usr/local/etc/php/conf.d"
+    container_name: tsugi_web_at24
+    networks:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+  mysql:
+    image: mariadb:10.5
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./.docker_data/mysql:/var/lib/mysql:delegated
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    container_name: tsugi_db_at24
+networks:
+  frontend:
+  backend:
+volumes:
+  data:
+  cache:
+    driver: local
